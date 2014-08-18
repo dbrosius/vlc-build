@@ -8,7 +8,7 @@ fdk := $(instdir)/lib/libfdk-aac.a
 yasm := $(instdir)/bin/yasm
 CFG_PKG_CONFIG_PATH := $(instdir)/lib/pkgconfig
 CFG_LDFLAGS := -L$(instdir)/lib
-CFG_CPPFLAGS := -I$(instdir)/lib
+CFG_CPPFLAGS := -I$(instdir)/include
 CFG_PATH := $(instdir)/bin
 
 # Default build target
