@@ -6,8 +6,8 @@ ffmpeg := $(instdir)/bin/ffmpeg
 x264 := $(instdir)/bin/x264
 fdk := $(instdir)/lib/libfdk-aac.a
 yasm := $(instdir)/bin/yasm
-mad := $(instdir)/bin/mad
-a52 := $(instdir)/bin/a52
+mad := $(instdir)/lib/libmad.a
+a52 := $(instdir)/bin/a52dec
 CFG_PKG_CONFIG_PATH := $(instdir)/lib/pkgconfig
 CFG_LDFLAGS := -L$(instdir)/lib
 CFG_CPPFLAGS := -I$(instdir)/include
@@ -36,12 +36,13 @@ $(a52): extdir := a52dec-0.7.4
 
 # Define configure parameters
 $(vlc): conf := ./configure --disable-lua
-$(ffmpeg): conf := ./configure --enable-static --disable-shared --enable-gpl --enable-nonfree --enable-libfdk-aac --enable-libx264
-$(x264): conf := ./configure --enable-static --disable-shared --disable-opencl
-$(fdk): conf := ./autogen.sh && ./configure --enable-static --disable-shared
+$(vlc): instdir := $(instdir) && sed "s|soliddatadir = /usr/share/kde4/apps//solid/actions|soliddatadir = $(instdir)/share/kde4/apps/solid/actions|"<share/Makefile >tempfile && mv tempfile share/Makefile
+$(ffmpeg): conf := ./configure --enable-shared --enable-gpl --enable-nonfree --enable-libfdk-aac --enable-libx264
+$(x264): conf := ./configure --disable-opencl --enable-static --enable-shared
+$(fdk): conf := ./autogen.sh && ./configure
 $(yasm): conf := ./configure
-$(mad): conf := CFLAGS="-Wall -g -O -fforce-addr -fthread-jumps -fcse-follow-jumps -fcse-skip-blocks -fexpensive-optimizations -fregmove -fschedule-insns2" ./configure --enable-static --disable-shared
-$(a52): conf := ./configure --enable-static --disable-shared
+$(mad): conf := CFLAGS="-Wall -g -O -fforce-addr -fthread-jumps -fcse-follow-jumps -fcse-skip-blocks -fexpensive-optimizations -fregmove -fschedule-insns2" ./configure
+$(a52): conf := CFLAGS=-fPIC ./configure
 
 $(vlc) $(ffmpeg) $(x264) $(fdk) $(yasm) $(mad) $(a52):
 	tar xvf $< || unzip $<
