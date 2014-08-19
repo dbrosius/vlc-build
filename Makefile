@@ -8,31 +8,32 @@ fdk := $(instdir)/lib/libfdk-aac.a
 yasm := $(instdir)/bin/yasm
 mad := $(instdir)/lib/libmad.a
 a52 := $(instdir)/bin/a52dec
-ogg := $(instdir)/bin/ogg
-vorbis := $(instdir)/bin/vorbis
-theora := $(instdir)/bin/theora
-vpx := $(instdir)/bin/vpx
+ogg := $(instdir)/lib/libogg.a
+vorbis := $(instdir)/lib/libvorbis.a
+theora := $(instdir)/lib/libtheora.a
+vpx := $(instdir)/bin/vpxenc
 flac := $(instdir)/bin/flac
 CFG_PKG_CONFIG_PATH := $(instdir)/lib/pkgconfig
 CFG_LDFLAGS := -L$(instdir)/lib
 CFG_CPPFLAGS := -I$(instdir)/include
 CFG_PATH := $(instdir)/bin
+all := $(vlc) $(ffmpeg) $(x264) $(fdk) $(mad) $(a52) $(vorbis) $(theora) $(vpx) $(flac) $(yasm) $(ogg)
 
 # Default build target
-default: $(vlc)
+default: $(all)
 
 # Define build dependencies
 $(vlc): vlc-2.1.5.tar.xz $(ffmpeg)
-$(ffmpeg): ffmpeg-2.3.3.tar.bz2 $(x264) $(fdk) $(mad) $(a52) $(ogg) $(vorbis) $(theora) $(vpx) $(flac)
+$(ffmpeg): ffmpeg-2.3.3.tar.bz2 $(x264) $(fdk) $(mad) $(a52) $(vorbis) $(theora) $(vpx) $(flac)
 $(x264): last_x264.tar.bz2 $(yasm)
 $(fdk): fdk-aac-master.zip
 $(yasm): yasm-1.3.0.tar.gz
 $(mad): libmad-0.15.1b.tar.gz
 $(a52): a52dec-0.7.4.tar.gz
 $(ogg): libogg-1.3.2.tar.xz
-$(vorbis): libvorbis-1.3.4.tar.xz
-$(theora): libtheora-1.1.1.tar.bz2
-$(vpx): libvpx-v1.3.0.tar.bz2
+$(vorbis): libvorbis-1.3.4.tar.xz $(ogg)
+$(theora): libtheora-1.1.1.tar.bz2 $(ogg)
+$(vpx): libvpx-v1.3.0.tar.bz2 $(yasm)
 $(flac): flac-1.3.0.tar.xz
 
 # Define extraction directories
@@ -51,7 +52,7 @@ $(flac): extdir := flac-1.3.0
 
 # Define configure parameters
 $(vlc): conf := ./configure --disable-lua --without-kde-solid
-$(ffmpeg): conf := ./configure --enable-shared --enable-gpl --enable-nonfree --enable-libfdk-aac --enable-libx264
+$(ffmpeg): conf := ./configure --enable-shared --enable-gpl --enable-nonfree --enable-libfdk-aac --enable-libx264 --enable-libvorbis --enable-libvpx
 $(x264): conf := ./configure --disable-opencl --enable-static --enable-shared
 $(fdk): conf := ./autogen.sh && ./configure
 $(yasm): conf := ./configure
@@ -60,10 +61,10 @@ $(a52): conf := CFLAGS=-fPIC ./configure
 $(ogg): conf := ./configure
 $(vorbis): conf := ./configure
 $(theora): conf := ./configure
-$(vpx): conf := ./configure
+$(vpx): conf := ./configure --enable-shared
 $(flac): conf := ./configure
 
-%:
+$(all):
 	tar xvf $< || unzip $<
 	cd $(extdir) && PATH="$(CFG_PATH):$$PATH" LDFLAGS=$(CFG_LDFLAGS) CPPFLAGS=$(CFG_CPPFLAGS) PKG_CONFIG_PATH=$(CFG_PKG_CONFIG_PATH) $(conf) --prefix=$(instdir)
 	PATH="$(CFG_PATH):$$PATH" $(MAKE) -C $(extdir)
