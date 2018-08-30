@@ -18,6 +18,8 @@ CFG_PKG_CONFIG_PATH := $(instdir)/lib/pkgconfig
 CFG_LDFLAGS := -L$(instdir)/lib
 CFG_CPPFLAGS := -I$(instdir)/include
 CFG_PATH := $(instdir)/bin
+CXXFLAGS = -std=c++11
+
 all := $(vlc) $(ffmpeg) $(x264) $(x265) $(fdk) $(mad) $(a52) $(vorbis) $(theora) $(vpx) $(flac) $(yasm) $(ogg)
 
 # Default build target
@@ -25,7 +27,7 @@ default: $(all)
 
 # Define build dependencies
 $(vlc): vlc-2.2.8.tar.xz $(ffmpeg)
-$(ffmpeg): ffmpeg-2.3.3.tar.bz2 $(x264) $(x265) $(fdk) $(mad) $(a52) $(vorbis) $(theora) $(vpx) $(flac)
+$(ffmpeg): ffmpeg-2.8.15.tar.bz2 $(x264) $(x265) $(fdk) $(mad) $(a52) $(vorbis) $(theora) $(vpx) $(flac)
 $(x264): last_x264.tar.bz2 $(yasm)
 $(x265): x265_2.6.tar.gz $(yasm)
 $(fdk): fdk-aac-master.zip
@@ -35,12 +37,12 @@ $(a52): a52dec-0.7.4.tar.gz
 $(ogg): libogg-1.3.2.tar.xz
 $(vorbis): libvorbis-1.3.4.tar.xz $(ogg)
 $(theora): libtheora-1.1.1.tar.bz2 $(ogg)
-$(vpx): libvpx-v1.3.0.tar.bz2 $(yasm)
+$(vpx): libvpx-v1.7.0.tar.bz2 $(yasm) #WARNING: The default extracts in pwd and had to be re-tarred for this build
 $(flac): flac-1.3.0.tar.xz
 
 # Define extraction directories
 $(vlc): extdir := vlc-2.2.8
-$(ffmpeg): extdir := ffmpeg-2.3.3
+$(ffmpeg): extdir := ffmpeg-2.8.15
 $(x264): extdir := x264-snapshot-20140817-2245
 $(x265): extdir := x265_v2.6
 $(fdk): extdir := fdk-aac-master
@@ -50,7 +52,7 @@ $(a52): extdir := a52dec-0.7.4
 $(ogg): extdir := libogg-1.3.2
 $(vorbis): extdir := libvorbis-1.3.4
 $(theora): extdir := libtheora-1.1.1
-$(vpx): extdir := libvpx-v1.3.0
+$(vpx): extdir := libvpx-v1.7.0
 $(flac): extdir := flac-1.3.0
 
 # Define configure parameters
